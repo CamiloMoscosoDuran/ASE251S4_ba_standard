@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Backend Analitico",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/analytics/sales-total": {
+      "get": {
+        "tags": ["Indicadores SQL Server"],
+        "summary": "Obtener ventas totales",
+        "description": "Calcula las ventas totales. Permite filtrar por año y mes. Si solo se envía el mes, consulta ese mes de todos los años.",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Año de las ventas. Debe ser un número entero entre 1 y 9999.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "Mes de las ventas. Debe ser un número entero entre 1 y 12.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ventas totales calculadas correctamente"
+          },
+          "400": {
+            "description": "Parámetros inválidos"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/analytics/sql/sales-by-region": {
+      "get": {
+        "summary": "Obtiene las ventas por región",
+        "responses": {
+          "200": {
+            "description": "Indicador de ventas agrupadas por región"
+          },
+          "503": {
+            "description": "Base de datos no disponible"
+          }
+        }
+      }
+    },
+    "/analytics/integrated/top-product": {
+      "get": {
+        "summary": "Obtener producto más vendido del mes",
+        "description": "Genera un indicador integrado combinando información transaccional de SQL Server con información maestra almacenada en MongoDB.",
+        "tags": ["Analytics Integrado"],
+        "responses": {
+          "200": {
+            "description": "Indicador del producto más vendido del mes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "indicator": {
+                      "type": "string",
+                      "example": "top_product_month"
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Producto más vendido del mes"
+                    },
+                    "chart_type": {
+                      "type": "string",
+                      "example": "card"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "product_id": {
+                          "type": "string",
+                          "example": "P004"
+                        },
+                        "product": {
+                          "type": "string",
+                          "example": "Smartphone Samsung 4"
+                        },
+                        "category": {
+                          "type": "string",
+                          "example": "Accessories"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "example": 15
+                        }
+                      }
+                    },
+                    "sources": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["SQL Server", "MongoDB"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontró información"
+          }
+        }
+      }
+    }
+  }
+}
